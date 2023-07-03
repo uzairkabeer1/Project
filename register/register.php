@@ -41,6 +41,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
+    // Password validation
+    $uppercase = preg_match('@[A-Z]@', $password);
+    $lowercase = preg_match('@[a-z]@', $password);
+    $number = preg_match('@[0-9]@', $password);
+    $specialChars = preg_match('@[^\w]@', $password);
+
+    if (!$uppercase || !$lowercase || !$number || !$specialChars || strlen($password) < 8) {
+        $response = array(
+            'success' => false,
+            'message' => 'Password should be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character'
+        );
+        echo json_encode($response);
+        exit();
+    }
+
+ 
     $insertSql = "INSERT INTO users (name, email, password) VALUES ('$name', '$email', '$password')";
     if (mysqli_query($conn, $insertSql)) {
         $response = array('success' => true);
@@ -52,4 +68,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 }
+
 mysqli_close($conn);
