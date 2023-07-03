@@ -4,12 +4,29 @@ if (isset($_SESSION["user_id"])) {
     header("Location: ../index.php");
     exit();
 }
-
+if(isset($_SESSION["error"])) {
+echo ("
+<div class='alert alert-success' role='alert'>
+You are not logged in. Please login first.
+</div>
+");
+unset($_SESSION['error']);
+session_destroy();
+}
 $referrer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
 $isFromRegisterPage = strpos($referrer, 'register_page.php') !== false;
 
 if ($isFromRegisterPage) {
     echo "<script>alert('Congratulations! You have registered.');</script>";
+}
+if (isset($_SESSION['logout_success'])) {
+  echo ("
+    <div class='alert alert-success' role='alert'>
+      You have successfully logged out.
+    </div>
+  ");
+  unset($_SESSION['logout_success']);
+  session_destroy();
 }
 ?>
 
