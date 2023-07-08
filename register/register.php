@@ -57,7 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
  
-    $insertSql = "INSERT INTO users (name, email, password) VALUES ('$name', '$email', '$password')";
+    $insertSql = "INSERT INTO users (name, email, password,is_admin) VALUES ('$name', '$email', '$password',0)";
     if (mysqli_query($conn, $insertSql)) {
         $response = array('success' => true);
         echo json_encode($response);

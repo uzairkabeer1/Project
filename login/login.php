@@ -26,17 +26,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         exit();
     }
 
-    $sql = "SELECT id, email FROM users WHERE email = '$username' AND password = '$password'";
+    $sql = "SELECT id, email, is_admin FROM users WHERE email = '$username' AND password = '$password'";
     $result = mysqli_query($conn, $sql);
 
     if (mysqli_num_rows($result) == 1) {
         $row = mysqli_fetch_assoc($result);
-        $_SESSION["user_id"] = $row["id"];
-    
-        $response = array(
-            "success" => true,
-            "redirect" => "../index.php"
-        );
+        
+        if($row["is_admin"] == 0){
+            $_SESSION["user_id"] = $row["id"];
+            $response = array(
+                "success" => true,
+                "redirect" => "../index.php"
+            );
+        }
+        else if($row["is_admin"] == 1){
+            $response = array(
+                "success" => true,
+                "redirect" => "../admin/admin_page.php"
+            );
+            $_SESSION['admin_logged']=true;
+        }
+       
         echo json_encode($response);
         exit();
     } else {
