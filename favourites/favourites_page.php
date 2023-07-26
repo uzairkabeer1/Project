@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION["user_id"])) {
-    header("Location: ../login/login.html");
+    header("Location: ../login/login.php");
     exit();
 }
 
@@ -17,9 +17,9 @@ $filterCondition = '';
 $userId = $_SESSION["user_id"]; // Assuming the user ID is stored in the session variable
 
 if ($filter === 'user') {
-    $filterCondition = "WHERE user_id = '$userId' AND author = '$userId'";
+    $filterCondition = "WHERE user_id = '$userId' AND author = '" . getUserNameById($userId) . "'";
 } elseif ($filter === 'api') {
-    $filterCondition = "WHERE user_id = '$userId' AND author <> '$userId'";
+    $filterCondition = "WHERE user_id = '$userId' AND author <> '" . getUserNameById($userId) . "'";
 } elseif ($filter === 'all') {
     $filterCondition = "WHERE user_id = '$userId'";
 }
