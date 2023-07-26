@@ -1,5 +1,6 @@
 <?php
 session_start();
+// Connect to the MySQL database
 $cleardb_url = parse_url(getenv("CLEARDB_DATABASE_URL"));
 $cleardb_server = $cleardb_url["host"];
 $cleardb_username = $cleardb_url["user"];
@@ -14,59 +15,40 @@ if (!$conn) {
     die("Connection failed: " . mysqli_connect_error());
 }
 
+// Handle the registration form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST["name"];
     $email = $_POST["email"];
     $password = $_POST["password"];
 
     if (empty($name) || empty($email) || empty($password)) {
-        $response = array('success' => false, 'message' => 'Please fill out all fields');
-        echo json_encode($response);
+        // Registration failed, redirect to registration page with error message
+        $_SESSION["register_error"] = "Please fill out all fields";
+        header("Location: register_page.php");
         exit();
     }
 
-    $checkEmailSql = "SELECT id FROM users WHERE email = '$email'";
-    $checkEmailResult = mysqli_query($conn, $checkEmailSql);
-    if (mysqli_num_rows($checkEmailResult) > 0) {
-        $response = array('success' => false, 'message' => 'Email already taken');
-        echo json_encode($response);
+    // Check if the username already exists in the database
+    $checkSql = "SELECT id FROM users WHERE email = '$email'";
+    $checkResult = mysqli_query($conn, $checkSql);
+    if (mysqli_num_rows($checkResult) > 0) {
+        // Username already taken, redirect to registration page with error message
+        $_SESSION["register_error"] = "Email already taken";
+        header("Location: register_error.php");
         exit();
     }
 
-    $checkUsernameSql = "SELECT id FROM users WHERE name = '$name'";
-    $checkUsernameResult = mysqli_query($conn, $checkUsernameSql);
-    if (mysqli_num_rows($checkUsernameResult) > 0) {
-        $response = array('success' => false, 'message' => 'Username already exists');
-        echo json_encode($response);
-        exit();
-    }
-
-    // Password validation
-    $uppercase = preg_match('@[A-Z]@', $password);
-    $lowercase = preg_match('@[a-z]@', $password);
-    $number = preg_match('@[0-9]@', $password);
-    $specialChars = preg_match('@[^\w]@', $password);
-
-    if (!$uppercase || !$lowercase || !$number || !$specialChars || strlen($password) < 8) {
-        $response = array(
-            'success' => false,
-            'message' => 'Password should be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character'
-        );
-        echo json_encode($response);
-        exit();
-    }
-
- 
-    $insertSql = "INSERT INTO users (name, email, password,is_admin) VALUES ('$name', '$email', '$password',0)";
+    // Insert the new user into the database
+    $insertSql = "INSERT INTO users (name, email, password) VALUES ('$name', '$email', '$password')";
     if (mysqli_query($conn, $insertSql)) {
-        $response = array('success' => true);
-        echo json_encode($response);
+        // Registration successful, redirect to login page
+        header("Location: ../login/login_page.php");
         exit();
     } else {
-        $response = array('success' => false, 'message' => 'Registration failed');
-        echo json_encode($response);
+        // Registration failed, redirect to registration page with error message
+        $_SESSION["register_error"] = "Registration failed";
+        header("Location: register_page.php");
         exit();
     }
 }
-
 mysqli_close($conn);
