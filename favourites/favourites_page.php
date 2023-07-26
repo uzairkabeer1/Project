@@ -15,11 +15,12 @@ $sort = isset($_GET['sort']) ? $_GET['sort'] : 'quote';
 // Define the filter condition for the SQL query
 $filterCondition = '';
 $userId = $_SESSION["user_id"]; // Assuming the user ID is stored in the session variable
+$userName = getUserNameById($userId); 
 
 if ($filter === 'user') {
-    $filterCondition = "WHERE user_id = '$userId' AND author = (SELECT author FROM favorite_quotes WHERE user_id = '$userId')";
+    $filterCondition = "WHERE user_id = '$userId' AND author = (SELECT author FROM favorite_quotes WHERE user_id = '$userId' LIMIT 1)";
 } elseif ($filter === 'api') {
-    $filterCondition = "WHERE user_id = '$userId' AND author <> (SELECT username FROM favorite_quotes WHERE user_id = '$userId')";
+    $filterCondition = "WHERE user_id = '$userId' AND author <> '$userName' AND author NOT IN (SELECT DISTINCT author FROM favorite_quotes WHERE user_id = '$userId')";
 } elseif ($filter === 'all') {
     $filterCondition = "WHERE user_id = '$userId'";
 }
