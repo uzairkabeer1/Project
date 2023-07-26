@@ -16,13 +16,10 @@ $sort = isset($_GET['sort']) ? $_GET['sort'] : 'quote';
 $filterCondition = '';
 $userId = $_SESSION["user_id"]; // Assuming the user ID is stored in the session variable
 
-// Get the username associated with the user ID
-$userName = getUserNameById($userId);
-
 if ($filter === 'user') {
-    $filterCondition = "WHERE user_id = '$userId' AND author = '" . mysqli_real_escape_string($conn, $userName) . "'";
+    $filterCondition = "WHERE user_id = '$userId' AND author = (SELECT author FROM favorite_quotes WHERE user_id = '$userId' LIMIT 1)";
 } elseif ($filter === 'api') {
-    $filterCondition = "WHERE user_id = '$userId' AND author <> '" . mysqli_real_escape_string($conn, $userName) . "'";
+    $filterCondition = "WHERE user_id = '$userId' AND author <> (SELECT author FROM favorite_quotes WHERE user_id = '$userId' LIMIT 1)";
 } elseif ($filter === 'all') {
     $filterCondition = "WHERE user_id = '$userId'";
 }
