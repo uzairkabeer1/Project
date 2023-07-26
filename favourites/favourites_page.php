@@ -7,17 +7,32 @@ if (!isset($_SESSION["user_id"])) {
 
 require_once "../common_functions.php";
 
-$filter = isset($_GET['filter']) ? $_GET['filter'] : 'user';
+
+// Get the filter and sort values from the URL parameters
+$filter = isset($_GET['filter']) ? $_GET['filter'] : 'user'; // Set the default filter to show user's quotes only
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'quote';
+
+// Define the filter condition for the SQL query
 $filterCondition = '';
-$userId = $_SESSION["user_id"];
+$userId = $_SESSION["user_id"]; // Assuming the user ID is stored in the session variable
 if ($filter === 'user') {
-    $filterCondition = "WHERE user_id = '$userId'";
-} elseif ($filter === 'other') {
-    $filterCondition = "WHERE user_id <> '$userId'";
+    $filterCondition = "WHERE user_id = '$userId' AND author = '$userId'";
+} elseif ($filter === 'api') {
+    $filterCondition = "WHERE user_id = '$userId' AND author <> '$userId'";
 }
+
+// If the filter is 'all', show all quotes with the same user_id
+if ($filter === 'all') {
+    $filterCondition = "WHERE user_id = '$userId'";
+}
+
+// Define the sort column for the SQL query
 $sortColumn = ($sort === 'author') ? 'author' : 'quote';
+
+// Build the SQL query with the filter and sort conditions
 $sql = "SELECT * FROM favorite_quotes $filterCondition ORDER BY $sortColumn";
+
+// Execute the SQL query and fetch the results
 $result = mysqli_query($conn, $sql);
 ?>
 
@@ -50,8 +65,8 @@ $result = mysqli_query($conn, $sql);
                 <form action="favourites_page.php" method="get" class="mb-3">
                     <label for="filter">Filter by:</label>
                     <select name="filter" id="filter">
-                        <option value="user" <?php if ($filter === 'user') echo 'selected'; ?>>API Quotes</option>
-                        <option value="other" <?php if ($filter === 'other') echo 'selected'; ?>>User Quotes</option>
+                        <option value="user" <?php if ($filter === 'user') echo 'selected'; ?>>User Quotes</option>
+                        <option value="other" <?php if ($filter === 'other') echo 'selected'; ?>>API Quotes</option>
                         <option value="all" <?php if ($filter === 'all') echo 'selected'; ?>>All Quotes</option>
                     </select>
 
