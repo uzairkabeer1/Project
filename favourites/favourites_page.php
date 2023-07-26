@@ -1,12 +1,27 @@
 <?php
 session_start();
-// Check if user is logged in, otherwise redirect to login page
 if (!isset($_SESSION["user_id"])) {
     header("Location: ../login/login.html");
     exit();
 }
 
 require_once "../common_functions.php";
+
+$filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
+$sort = isset($_GET['sort']) ? $_GET['sort'] : 'quote';
+
+$filterCondition = '';
+if ($filter === 'user') {
+    $filterCondition = "AND user_id = '$userId'";
+} elseif ($filter === 'other') {
+    $filterCondition = "AND user_id <> '$userId'";
+}
+
+$sortColumn = ($sort === 'author') ? 'author' : 'quote';
+
+$sql = "SELECT * FROM favorite_quotes WHERE 1 $filterCondition ORDER BY $sortColumn";
+
+$result = mysqli_query($conn, $sql);
 ?>
 
 <!DOCTYPE html>
@@ -35,6 +50,22 @@ require_once "../common_functions.php";
         <div class="row">
             <div class="col-12 py-5">
                 <h1>Favourite Quotes</h1>
+                <form action="favourites_page.php" method="get" class="mb-3">
+                    <label for="filter">Filter by:</label>
+                    <select name="filter" id="filter">
+                        <option value="user" <?php if ($filter === 'user') echo 'selected'; ?>>User Quotes</option>
+                        <option value="other" <?php if ($filter === 'other') echo 'selected'; ?>>Other Quotes</option>
+                        <option value="all" <?php if ($filter === 'all') echo 'selected'; ?>>All Quotes</option>
+                    </select>
+
+                    <label for="sort">Sort by:</label>
+                    <select name="sort" id="sort">
+                        <option value="quote" <?php if ($sort === 'quote') echo 'selected'; ?>>Quote</option>
+                        <option value="author" <?php if ($sort === 'author') echo 'selected'; ?>>Author</option>
+                    </select>
+
+                    <button type="submit" class="btn btn-primary">Apply Filters</button>
+                </form>
                 <div class="table-responsive">
                     <table class="table table-hover py-3">
                         <thead>
@@ -46,9 +77,6 @@ require_once "../common_functions.php";
                         </thead>
                         <tbody>
                             <?php
-                            $userId = getUserId();
-                            $sql = "SELECT * FROM favorite_quotes WHERE user_id = '$userId'";
-                            $result = mysqli_query($conn, $sql);
                             while ($row = mysqli_fetch_assoc($result)) {
                                 $quoteId = $row['id'];
                                 $sql = "SELECT * FROM favorite_quotes WHERE id = '$quoteId'";
@@ -58,13 +86,13 @@ require_once "../common_functions.php";
                                 <tr>
                                     <td><?php echo $quote['quote'] ?></td>
                                     <td><?php echo $quote['author'] ?></td>
-                                    <td class="" >
+                                    <td class="">
                                         <form action="favourites.php" method="post">
                                             <input type="hidden" name="action" value="removeFavorite">
                                             <input type="hidden" name="quoteId" value="<?php echo $quote['id'] ?>">
                                             <button type="submit" class="btn btn-sm btn-danger">Remove</button>
                                         </form>
-                                        <a href="edit_favourite_page.php?id=<?php echo $quote['id'] ?>" class="btn btn-sm btn-warning mt-2" >Edit</a>
+                                        <a href="edit_favourite_page.php?id=<?php echo $quote['id'] ?>" class="btn btn-sm btn-warning mt-2">Edit</a>
                                     </td>
                                 </tr>
                             <?php
