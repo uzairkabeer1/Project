@@ -17,7 +17,7 @@ $filterCondition = '';
 $userId = $_SESSION["user_id"]; // Assuming the user ID is stored in the session variable
 
 // Get the username associated with the user ID
-$userName = getUserNameByUserId($userId);
+$userName = getUserNameById($userId);
 
 if ($filter === 'user') {
     $filterCondition = "WHERE user_id = '$userId' AND author = '" . mysqli_real_escape_string($conn, $userName) . "'";
