@@ -17,10 +17,9 @@ $filterCondition = '';
 $userId = $_SESSION["user_id"]; // Assuming the user ID is stored in the session variable
 
 if ($filter === 'user') {
-    $filterCondition = "WHERE user_id = '$userId' AND author = (SELECT author FROM favorite_quotes WHERE user_id = '$userId' LIMIT 1)";
+    $filterCondition = "WHERE user_id = '$userId' AND author = (SELECT author FROM favorite_quotes WHERE user_id = '$userId')";
 } elseif ($filter === 'api') {
-    $filterCondition = "LEFT JOIN favorite_quotes AS fq ON fq.user_id = '$userId' AND fq.author <> (SELECT author FROM favorite_quotes WHERE user_id = '$userId' LIMIT 1)";
-    $filterCondition .= " WHERE fq.id IS NOT NULL";
+    $filterCondition = "WHERE user_id = '$userId' AND author <> (SELECT username FROM users WHERE user_id = '$userId')";
 } elseif ($filter === 'all') {
     $filterCondition = "WHERE user_id = '$userId'";
 }
