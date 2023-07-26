@@ -8,30 +8,33 @@ if (!isset($_SESSION["user_id"])) {
 require_once "../common_functions.php";
 
 
-// // Get the filter and sort values from the URL parameters
-// $filter = isset($_GET['filter']) ? $_GET['filter'] : 'user'; // Set the default filter to show user's quotes only
-// $sort = isset($_GET['sort']) ? $_GET['sort'] : 'quote';
+// Get the filter and sort values from the URL parameters
+$filter = isset($_GET['filter']) ? $_GET['filter'] : 'user'; // Set the default filter to show user's quotes only
+$sort = isset($_GET['sort']) ? $_GET['sort'] : 'quote';
 
-// // Define the filter condition for the SQL query
-// $filterCondition = '';
-// $userId = $_SESSION["user_id"]; // Assuming the user ID is stored in the session variable
+// Define the filter condition for the SQL query
+$filterCondition = '';
+$userId = $_SESSION["user_id"]; // Assuming the user ID is stored in the session variable
 
-// if ($filter === 'user') {
-//     $filterCondition = "WHERE user_id = '$userId' AND author = '" . getUserNameById($userId) . "'";
-// } elseif ($filter === 'api') {
-//     $filterCondition = "WHERE user_id = '$userId' AND author <> '" . getUserNameById($userId) . "'";
-// } elseif ($filter === 'all') {
-//     $filterCondition = "WHERE user_id = '$userId'";
-// }
+// Get the username associated with the user ID
+$userName = getUserNameByUserId($userId);
 
-// // Define the sort column for the SQL query
-// $sortColumn = ($sort === 'author') ? 'author' : 'quote';
+if ($filter === 'user') {
+    $filterCondition = "WHERE user_id = '$userId' AND author = '" . mysqli_real_escape_string($conn, $userName) . "'";
+} elseif ($filter === 'api') {
+    $filterCondition = "WHERE user_id = '$userId' AND author <> '" . mysqli_real_escape_string($conn, $userName) . "'";
+} elseif ($filter === 'all') {
+    $filterCondition = "WHERE user_id = '$userId'";
+}
 
-// // Build the SQL query with the filter and sort conditions
-// $sql = "SELECT * FROM favorite_quotes $filterCondition ORDER BY $sortColumn";
+// Define the sort column for the SQL query
+$sortColumn = ($sort === 'author') ? 'author' : 'quote';
 
-// // Execute the SQL query and fetch the results
-// $result = mysqli_query($conn, $sql);
+// Build the SQL query with the filter and sort conditions
+$sql = "SELECT * FROM favorite_quotes $filterCondition ORDER BY $sortColumn";
+
+// Execute the SQL query and fetch the results
+$result = mysqli_query($conn, $sql);
 ?>
 
 <!DOCTYPE html>
