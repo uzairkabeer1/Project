@@ -9,18 +9,15 @@ require_once "../common_functions.php";
 
 $filter = isset($_GET['filter']) ? $_GET['filter'] : 'all';
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'quote';
-
 $filterCondition = '';
+$userId = $_SESSION["user_id"]; 
 if ($filter === 'user') {
     $filterCondition = "AND user_id = '$userId'";
 } elseif ($filter === 'other') {
     $filterCondition = "AND user_id <> '$userId'";
 }
-
 $sortColumn = ($sort === 'author') ? 'author' : 'quote';
-
 $sql = "SELECT * FROM favorite_quotes WHERE 1 $filterCondition ORDER BY $sortColumn";
-
 $result = mysqli_query($conn, $sql);
 ?>
 

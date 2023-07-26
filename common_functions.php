@@ -100,4 +100,13 @@ function getUserByEmailOrUsername($email, $name)
     $user = mysqli_fetch_assoc($result);
     return $user;
 }
+function getUserNameById($userId)
+{
+    global $conn;
+    $userId = mysqli_real_escape_string($conn, $userId);
+    $sql = "SELECT user_name FROM users WHERE id = '$userId'";
+    $result = mysqli_query($conn, $sql);
+    $row = mysqli_fetch_assoc($result);
+    return isset($row['user_name']) ? $row['user_name'] : '';
+}
 ?>
