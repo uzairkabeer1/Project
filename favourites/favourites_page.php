@@ -50,8 +50,8 @@ $result = mysqli_query($conn, $sql);
                 <form action="favourites_page.php" method="get" class="mb-3">
                     <label for="filter">Filter by:</label>
                     <select name="filter" id="filter">
-                        <option value="user" <?php if ($filter === 'user') echo 'selected'; ?>>User Quotes</option>
-                        <option value="other" <?php if ($filter === 'other') echo 'selected'; ?>>Other Quotes</option>
+                        <option value="user" <?php if ($filter === 'user') echo 'selected'; ?>>API Quotes</option>
+                        <option value="other" <?php if ($filter === 'other') echo 'selected'; ?>>User Quotes</option>
                         <option value="all" <?php if ($filter === 'all') echo 'selected'; ?>>All Quotes</option>
                     </select>
 
